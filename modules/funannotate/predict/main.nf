@@ -9,6 +9,7 @@ process FUNANNOTATE_PREDICT {
     input:
     tuple val(sid), path(genome), val(species_name), val(strain_name)
     val busco_seed_species
+    val busco_db
     path protein_alignments
     path protein_evidence
     path protein_evidence_2
@@ -27,6 +28,7 @@ process FUNANNOTATE_PREDICT {
       --species '$species_name' \
       --strain '$strain_name' \
       --busco_seed_species $busco_seed_species \
+      --busco_db $busco_db \
       --protein_evidence $protein_evidence $protein_evidence_2 \
       --optimize_augustus \
       --cpus ${task.cpus}

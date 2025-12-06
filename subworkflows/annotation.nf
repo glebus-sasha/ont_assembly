@@ -16,6 +16,7 @@ workflow annotation {
     take:
     genome_template_file_species_name_strain_name
     busco_seed_species
+    busco_db
     protein_alignments
     protein_evidence
     protein_evidence_2
@@ -34,6 +35,7 @@ workflow annotation {
     FUNANNOTATE_MASK(FUNANNOTATE_SORT.out)
     FUNANNOTATE_PREDICT(
         FUNANNOTATE_MASK.out.join(species_name).join(strain_name),
+        busco_db,
         busco_seed_species,
         protein_alignments,
         protein_evidence,
