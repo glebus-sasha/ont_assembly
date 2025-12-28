@@ -1,19 +1,17 @@
 process MAFFT_2 {
-    publishDir 'results/MAFFT_2'
     tag "all_samples"
     conda 'bioconda::mafft'
     container 'staphb/mafft:7.526'
-    errorStrategy 'ignore'
     cpus params.cpus 
 
     input:
-    path fasta
+    tuple val(sid), path(fasta)
 
     output:
-    path "aligned.fasta", emit: multifasta
+    tuple val(sid), path("*_multi.fasta"), emit: multifasta
        
     script:
     """
-    mafft --auto $fasta > aligned.fasta 
+    mafft --auto $fasta > ${sid}_multi.fasta 
     """
 }

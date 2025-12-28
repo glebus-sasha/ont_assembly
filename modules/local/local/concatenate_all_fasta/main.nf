@@ -1,17 +1,16 @@
 process CONCATENATE_ALL_FASTA {
-    publishDir 'results/CONCATENATE_ALL_FASTA'
     tag "all_samples"
     //errorStrategy 'ignore'
     cpus params.cpus 
 
     input:
-    path files
+    tuple val(gene), path(files)
 
     output:
-    path "concatenate.fasta", emit: fasta
+    tuple val(gene), path("*.fasta"), emit: fasta
        
     script:
     """
-    cat $files > concatenate.fasta
+    cat $files > ${gene}.fasta
     """
 }

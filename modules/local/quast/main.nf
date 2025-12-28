@@ -6,7 +6,7 @@ process QUAST {
     cpus params.cpus
        
     input:
-    tuple val(sid), path(genome), path(gff)
+    tuple val(sid), path(genome)
     
     output:
     tuple val(sid), path("${sid}")
@@ -15,7 +15,6 @@ process QUAST {
     """
     quast.py \
         ${genome} \
-        --features ${gff} \
         -o ${sid} \
         --threads ${task.cpus}
     """
