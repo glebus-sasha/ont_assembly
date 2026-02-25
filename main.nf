@@ -121,7 +121,7 @@ workflow {
     //
     // MODULE: MultiQC
     //
-    ch_multiqc_logo = "${projectDir}/assets/oxkolpakova-ont-assembly_logo_light.svg"
+    ch_multiqc_logo = channel.value(file("${projectDir}/assets/oxkolpakova-ont-assembly_logo_light.svg"))
     MULTIQC(
         ch_multiqc_files,
         [],
