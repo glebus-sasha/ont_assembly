@@ -1,15 +1,15 @@
 process SIGNALP {
-    tag "$sid"
+    tag "${meta.id}"
     conda 'bioconda::signalp'
     container 'doejgi/signalp:v5'
     errorStrategy 'ignore'
     cpus params.cpus 
 
     input:
-    tuple val(sid), path(proteins)
+    tuple val(meta), path(proteins)
 
     output:
-    tuple val(sid), path("*.signalp5")
+    tuple val(meta), path("*.signalp5")
 
     script:
     """

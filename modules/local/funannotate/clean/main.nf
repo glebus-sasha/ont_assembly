@@ -1,5 +1,5 @@
 process FUNANNOTATE_CLEAN {
-    tag "$genome"
+    tag "${meta.id}"
     
     conda 'bioconda::funannotate'
     container 'nextgenusfs/funannotate:v1.8.15'
@@ -7,13 +7,13 @@ process FUNANNOTATE_CLEAN {
     cpus params.cpus 
 
     input:
-    tuple val(sid), path(genome)
+    tuple val(meta), path(genome)
   
     output:
-    tuple val(sid), path("${sid}_cleaned.fa")
+    tuple val(meta), path("*_cleaned.fa")
 
     script:
     """
-    funannotate clean -i $genome --minlen 1000 -o ${sid}_cleaned.fa
+    funannotate clean -i $genome --minlen 1000 -o ${meta.id}_cleaned.fa
     """
     }

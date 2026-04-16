@@ -1,16 +1,16 @@
 process ANTISMASH {
-    tag "${sid}"
+    tag "${meta.id}"
     conda 'bioconda::antismash'
     container 'antismash/standalone:8.0.1'
     //errorStrategy 'ignore'
     cpus params.cpus
        
     input:
-    tuple val(sid), path(genome), path(gbk)
+    tuple val(meta), path(genome), path(gbk)
     
     output:
-    tuple val(sid), path("${sid}_antismash"), emit: antismash_folder
-    tuple val(sid), path("${sid}_antismash/${sid}.gbk"), emit: gbk
+    tuple val(meta), path("*_antismash"), emit: antismash_folder
+    tuple val(meta), path("*_antismash/${meta.id}.gbk"), emit: gbk
 
     script:
     """
@@ -18,8 +18,8 @@ process ANTISMASH {
         --taxon fungi \
         --genefinding-too none \
         --cpus ${task.cpus} \
-        --output-dir ${sid}_antismash \
-        --output-basename $sid \
+        --output-dir ${meta.id}_antismash \
+        --output-basename ${meta.id} \
         --clusterhmmer \
         --pfam2go \
         --cb-general \

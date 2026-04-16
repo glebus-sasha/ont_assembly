@@ -1,21 +1,21 @@
 process QUAST {
-    tag "$sid"
+    tag "$meta.id"
     conda 'bioconda::quast'
     container 'staphb/quast:5.3.0'
     //errorStrategy 'ignore'
     cpus params.cpus
        
     input:
-    tuple val(sid), path(genome)
+    tuple val(meta), path(genome)
     
     output:
-    tuple val(sid), path("${sid}")
+    tuple val(meta), path("${meta.id}")
     
     script:
     """
     quast.py \
         ${genome} \
-        -o ${sid} \
+        -o ${meta.id} \
         --threads ${task.cpus}
     """
 }

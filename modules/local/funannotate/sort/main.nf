@@ -1,5 +1,5 @@
 process FUNANNOTATE_SORT {
-    tag "$genome"
+    tag "${meta.id}"
     
     conda 'bioconda::funannotate'
     container 'nextgenusfs/funannotate:v1.8.15'
@@ -7,13 +7,13 @@ process FUNANNOTATE_SORT {
     cpus params.cpus 
 
     input:
-    tuple val(sid), path(genome)
+    tuple val(meta), path(genome)
   
     output:
-    tuple val(sid), path("${sid}_sorted.fa")
+    tuple val(meta), path("*_sorted.fa")
 
     script:
     """
-    funannotate sort -i $genome -b scaffold -o ${sid}_sorted.fa
+    funannotate sort -i $genome -b scaffold -o ${meta.id}_sorted.fa
     """
     }

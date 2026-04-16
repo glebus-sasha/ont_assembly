@@ -1,19 +1,19 @@
-process FUNANNOTATE_MASK {
-    tag "${meta.id}"
-    
+process FUNANNOTATE_BUSCO_INSTALL {
+    tag "$busco_bd_name"
     conda 'bioconda::funannotate'
     container 'nextgenusfs/funannotate:v1.8.15'
     errorStrategy 'ignore'
     cpus params.cpus 
 
     input:
-    tuple val(meta), path(genome)
+    val(busco_bd_name)
   
     output:
-    tuple val(meta), path("*_masked.fa")
+    path("*")
 
     script:
     """
-    funannotate mask -i $genome -o ${meta.id}_masked.fa
+    funannotate setup \\
+        -b $busco_bd_name
     """
     }

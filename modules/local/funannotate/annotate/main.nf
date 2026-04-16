@@ -1,5 +1,5 @@
 process FUNANNOTATE_ANNOTATE {
-    tag "$sid"
+    tag "${meta.id}"
     
     conda 'bioconda::funannotate'
     container 'nextgenusfs/funannotate:v1.8.15'
@@ -7,13 +7,13 @@ process FUNANNOTATE_ANNOTATE {
     cpus params.cpus 
 
     input:
-    tuple val(sid), val(species_name), path(template_file), path(fun_folder), path(antismash), path(emapper_annotations), path(phobius), path(signalp), path(iprscan)
+    tuple val(meta), val(species_name), path(template_file), path(fun_folder), path(antismash), path(emapper_annotations), path(phobius), path(signalp), path(iprscan)
 
     output:
-    tuple val(sid), path("${fun_folder}/annotate_results")                      , emit: funannotate_annotate
-    tuple val(sid), path("${fun_folder}/annotate_results/${species_name}*.gff3"), emit: gff
-    tuple val(sid), path("${fun_folder}/annotate_results/${species_name}*.gbk") , emit: gbk
-    tuple val(sid), path("${fun_folder}/annotate_results/${species_name}*.tbl") , emit: tbl
+    tuple val(meta), path("${fun_folder}/annotate_results")                      , emit: funannotate_annotate
+    tuple val(meta), path("${fun_folder}/annotate_results/${species_name}*.gff3"), emit: gff
+    tuple val(meta), path("${fun_folder}/annotate_results/${species_name}*.gbk") , emit: gbk
+    tuple val(meta), path("${fun_folder}/annotate_results/${species_name}*.tbl") , emit: tbl
 
     script:
     """
@@ -21,7 +21,7 @@ process FUNANNOTATE_ANNOTATE {
       --species $species_name \
       --cpus $task.cpus \
       --sbt $template_file \
-      --out ${sid}_annotate \
+      --out ${meta.id}_annotate \
       --antismash $antismash \
       --eggnog $emapper_annotations \
       --phobius $phobius \

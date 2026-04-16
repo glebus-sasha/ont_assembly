@@ -1,19 +1,19 @@
 process PHOBIUS {
-    tag "$sid"
+    tag "${meta.id}"
     conda 'bioconda::phobius'
     container 'barbarahelena/phobius:1.01'
     errorStrategy 'ignore'
     cpus params.cpus 
 
     input:
-    tuple val(sid), path(proteins)
+    tuple val(meta), path(proteins)
 
     output:
-    tuple val(sid), path("${sid}_phobius.txt")
+    tuple val(meta), path("*_phobius.txt")
 
     script:
     """
-    phobius $proteins -short > ${sid}_phobius.txt
+    phobius $proteins -short > ${meta.id}_phobius.txt
     """
 }
 

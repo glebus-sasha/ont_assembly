@@ -1,8 +1,9 @@
 include { samplesheetToList         } from 'plugin/nf-schema'
 include { assembly_taxonomy_hybrid           } from './subworkflows/assembly_taxonomy_hybrid.nf'
 //include { convert_fast5_to_fastq             } from './subworkflows/convert_fast5_to_fastq.nf'
-//include { annotation                         } from './subworkflows/annotation.nf'
+include { annotation                         } from './subworkflows/annotation.nf'
 include { phylogeny                          } from './subworkflows/phylogeny.nf'
+include { QUAST                              } from './modules/nf-core/quast/'
 include { MULTIQC                            } from './modules/nf-core/multiqc/'
 
 workflow {
@@ -46,13 +47,14 @@ workflow {
             .map { _sample, meta, reads -> [meta, reads] }
             .set { ch_reads }
 
-        assembly_taxonomy_hybrid(ch_reads)
+        assembly_taxonomy_hybrid(
+            ch_reads
+            )
         genome = assembly_taxonomy_hybrid.out.genome
         ch_multiqc_files = ch_multiqc_files
             .mix(assembly_taxonomy_hybrid.out.multiqc_files)
 
     }
-/*
     //
     // SUBWORKFLOW: Annotation
     //
@@ -60,23 +62,24 @@ workflow {
         log.info ">>Skipping assembly step"
     }
     if ( params.annotation ) {
-        species_name              = params.species_name
-        strain_name               = params.strain_name
+        species_name             = channel.value(params.species_name)
+        strain_name              = channel.value(params.strain_name)
         template_file            = channel.value(file(params.template_file))
             .map{ it -> [it.simpleName, it] }
         ch_annotation_input = assembly_taxonomy_hybrid.out.genome
-            .join(template_file)
-            .join(species_name)
-            .join(strain_name)
+            .combine(template_file)
+            .combine(species_name)
+            .combine(strain_name)
         protein_alignments       = channel.value(file(params.protein_alignments))
         protein_evidence         = channel.value(file(params.protein_evidence))
         protein_evidence_2       = channel.value(file(params.protein_evidence_2))
         eggnog_proteins          = channel.value(file(params.eggnog_proteins))
         interproscan             = channel.value(file(params.interproscan))
+        busco_db                 = channel.value(file(params.busco_db))
         annotation(
             ch_annotation_input,
             params.busco_seed_species,
-            params.busco_db,
+            busco_db,
             protein_alignments,
             protein_evidence,
             protein_evidence_2,
@@ -84,13 +87,11 @@ workflow {
             interproscan
         )
         ch_multiqc_files = ch_multiqc_files
-            .mix(assembly_taxonomy_hybrid.out.fastqc.map { it -> it[1]} )
-            .mix(assembly_taxonomy_hybrid.out.fastqc_trimmed.map { it -> it[1]} )
+            .mix(assembly_taxonomy_hybrid.out.multiqc_files)
     }
     else {
         log.info ">>Skipping annotation step"
     }
-*/
     //
     // SUBWORKFLOW: Phylogeny
     //
@@ -117,6 +118,15 @@ workflow {
     else {
         log.info ">>Skipping phylogeny step"
     }
+    //
+    // MODULE: Check fastq quality
+    //
+    QUAST(
+        genome,
+        [[],[]],
+        [[],[]]
+    )
+    ch_multiqc_files = ch_multiqc_files.mix(QUAST.out.results.map{ _meta, file -> file })
     ch_multiqc_files = ch_multiqc_files.collect()
     //
     // MODULE: MultiQC

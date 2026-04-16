@@ -1,5 +1,5 @@
 process FUNANNOTATE_FIX {
-    tag "$sid"
+    tag "${meta.id}"
     
     conda 'bioconda::funannotate'
     container 'nextgenusfs/funannotate:v1.8.15'
@@ -7,16 +7,16 @@ process FUNANNOTATE_FIX {
     cpus params.cpus 
 
     input:
-    tuple val(sid), path(gbk), path(tbl)
+    tuple val(meta), path(gbk), path(tbl)
 
     output:
-    tuple val(sid), path("${sid}_fixed"), emit: fixed
+    tuple val(meta), path("*_fixed"), emit: fixed
 
     script:
     """
     funannotate fix \\
       --input $gbk \\
       --tbl $tbl \\
-      --out ${sid}_fixed
+      --out ${meta.id}_fixed
     """
     }
